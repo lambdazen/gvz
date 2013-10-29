@@ -453,7 +453,7 @@ public class GremlinPipelineAnalyzerTest extends TestCase {
 
 		assertEquals(5, pa.getExprNames().size());
 		System.out.println(pa.getExprNames());
-		
+
 		assertEquals(1, pa.getMarkedVertices((String)(pa.getExprNames().get(0))).size());
 		assertEquals(0, pa.getMarkedEdges((String)(pa.getExprNames().get(0))).size());
 		assertEquals(0, pa.getMarkedVertices((String)(pa.getExprNames().get(1))).size());
@@ -465,7 +465,60 @@ public class GremlinPipelineAnalyzerTest extends TestCase {
 		assertEquals(3, pa.getMarkedVertices((String)(pa.getExprNames().get(4))).size());
 		assertEquals(0, pa.getMarkedEdges((String)(pa.getExprNames().get(4))).size());
 
-		JungViewer jv = new JungViewer(pa);
-		jv.slideshow();
+//		JungViewer jv = new JungViewer(pa);
+//		jv.slideshow();
+	}
+
+	public void testFiveInEOutVWifeCollectSteps() throws Exception {
+	    GremlinPipeline pipeline = new GremlinPipeline(graph).V("name", "Joseph Patrick Kennedy, Sr.").inE("father").outV()
+	            .filter(new PipeFunction<Vertex, Boolean>() {
+	                @Override
+	                public Boolean compute(Vertex v) {
+	                    return v.getProperty("sex").equals("male");
+	                }
+	            }).as("husband").out("wife").back("husband").in("father");
+	    System.out.println("Pipeline: " + pipeline);
+
+	    GremlinPipelineAnalyzer pa = new GremlinPipelineAnalyzer(pipeline);
+
+	    Iterator<Vertex> iter = pa.getGraph().getVertices("name", "Joseph Patrick Kennedy, Sr.").iterator();
+	    assertTrue(iter.hasNext());
+	    Vertex jfkSr = iter.next();
+	    assertEquals("Joseph Patrick Kennedy, Sr.", jfkSr.getProperty("name"));
+	    assertEquals(new Integer(1969), jfkSr.getProperty("died"));
+
+	    // The sub-graph should not pick up the wife
+	    iter = new GremlinPipeline(pa.getGraph()).V("name", "Joseph Patrick Kennedy, Sr.").out("wife").iterator();
+	    assertFalse(iter.hasNext());
+
+	    // The sub-graph should have all of JFK Sr. children
+	    iter = new GremlinPipeline(pa.getGraph()).V("name", "Joseph Patrick Kennedy, Sr.").both().iterator();
+
+	    int counter = 0;
+	    while (iter.hasNext()) {
+	        Vertex v = iter.next();
+	        counter++;
+	    }
+
+	    assertEquals(9, counter);
+
+	    assertEquals(6, pa.getExprNames().size());
+	    System.out.println(pa.getExprNames());
+
+	    assertEquals(1, pa.getMarkedVertices((String)(pa.getExprNames().get(0))).size());
+	    assertEquals(0, pa.getMarkedEdges((String)(pa.getExprNames().get(0))).size());
+	    assertEquals(0, pa.getMarkedVertices((String)(pa.getExprNames().get(1))).size());
+	    assertEquals(9, pa.getMarkedEdges((String)(pa.getExprNames().get(1))).size());
+	    assertEquals(9, pa.getMarkedVertices((String)(pa.getExprNames().get(2))).size());
+	    assertEquals(0, pa.getMarkedEdges((String)(pa.getExprNames().get(2))).size());
+	    assertEquals(4, pa.getMarkedVertices((String)(pa.getExprNames().get(3))).size());
+	    assertEquals(0, pa.getMarkedEdges((String)(pa.getExprNames().get(3))).size());
+	    assertEquals(3, pa.getMarkedVertices((String)(pa.getExprNames().get(4))).size());
+	    assertEquals(0, pa.getMarkedEdges((String)(pa.getExprNames().get(4))).size());
+        assertEquals(5, pa.getMarkedVertices((String)(pa.getExprNames().get(5))).size());
+        assertEquals(0, pa.getMarkedEdges((String)(pa.getExprNames().get(5))).size());
+
+	    JungViewer jv = new JungViewer(pa);
+	    jv.slideshow(2);
 	}
 }
