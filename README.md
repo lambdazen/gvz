@@ -45,6 +45,8 @@ gremlin> x.slideshow(10) // same with a 10 second gap
 This is a proof-of-concept. 
 
 - UI is very basic (very little effort has gone in)
+- Integration with Gremlin is clunky because the output of gvz must be stored in a variable on which slideshow(), next(), etc must be invoked. 
+- Traversing the visualization requires command-line operations. It may be better to have these operations on the UI itself. 
 - The goal is to show the graphs using GraphStream, but I ran into issues with Maven. The design allows for multiple viewers. The code for GraphStream should go into the now empty com.tinkerpop.gvz.graphstream.GraphStreamViewer. 
 
 ## Limitations by design
