@@ -28,6 +28,7 @@ public class JungViewer {
 	int size;
 	JFrame frame;
 	VisualizationViewer<Vertex, Edge> viz;
+	boolean disposed = true; // Need to open the window the first time 
 
 	public JungViewer(IGvzModel mdl) {
 		this.model = mdl;
@@ -93,12 +94,6 @@ public class JungViewer {
 		viz.setEdgeToolTipTransformer(edgeTooltipTransformer);
 		viz.getRenderContext().setVertexFillPaintTransformer(vertexPaintTransformer);
 		viz.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer);
-
-		frame = new JFrame("Gremlin Visualizer");
-		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(viz);
-		frame.pack();
-		frame.setVisible(true);
 
 		display();
 	}
@@ -166,10 +161,26 @@ public class JungViewer {
 	}
 
 	private void display() {
-		System.out.println("Showing " + (getIndex()+1) + " of " + getSize() + ": " + getExprName());
+	    if (disposed) {
+            frame = new JFrame("Gremlin Visualizer") {
+                @Override
+    	        public void dispose() {
+                    disposed = true;
+    	            super.dispose();
+    	        }
+    	    };
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.getContentPane().add(viz);
+            
+            disposed = false;
+	    }
+
+        frame.pack();
+        frame.repaint();
+        frame.setVisible(true);
+
+	    System.out.println("Showing " + (getIndex()+1) + " of " + getSize() + ": " + getExprName());
 		viz.repaint();
-		frame.repaint();
-		frame.setVisible(true);
 	}
 
 	public void slideshow() throws InterruptedException {
