@@ -1,6 +1,6 @@
 ## Overview
 
-gvz (pronounced gee-whiz) is a visualization tool for Gremlin used to debug Gremlin expressions. The tool illustrates the portion of the graph database accessed by each step of the input Gremlin expression. 
+gvz (pronounced gee-whiz) is a visualization tool for Gremlin used to debug Gremlin expressions, compatible with Tinkerpop 2.x. The tool illustrates the portion of the graph database accessed by each step of the input Gremlin expression. 
 
 ## Installation
 
